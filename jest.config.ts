@@ -13,6 +13,7 @@ export default {
     '<rootDir>/libs/passenger/feature-edit',
     '<rootDir>/$"14.4.0-beta.5"root}',
     '<rootDir>/$"14.4.0-beta.5"root}',
+    '<rootDir>/$"14.4.0-beta.5"root}',
     '<rootDir>/$"14.4.0-beta.5"root}'
   ]
 };
