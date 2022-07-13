@@ -379,7 +379,7 @@ After performing some changes, it's important to know which apps and libs might 
 1. Add an UI library providing a ``LuggageCardComponent`` (similar to the ``FlightCardComponent`` in the ``flight-app``)
   
   ```typescript
-  ng g lib ui-card --directory luggage --buildable
+  ng g @angular-architects/ddd:ui card --domain luggage
   ```
 
   **Remarks:** The ``publishable`` (also ``buildable``) switch makes sure the library can be compiled separately which is the key for incremental compilation.
@@ -423,9 +423,9 @@ After performing some changes, it's important to know which apps and libs might 
 
 ## Bonus: Configure a Shared Utility Library **
 
-- In ``nx.json`` Assign some additional tags to your ``logger-lib`` making sure it's part of the shared kernel's utility layer
+- In ``angular.json`` assign some additional tags to your ``logger-lib`` making sure it's part of the shared kernel's utility layer
   
-  **Hint:** In addition to the preexisting tag ``shared`` -- which is needed for the simplified domains -- assign the tag ``domain:shared`` as well as the tag ``type:util``.
+  **Hint:** In addition to the preexisting tag ``domain:shared`` add the tag ``type:util``.
   
 - Restart your IDE.
   

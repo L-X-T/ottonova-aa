@@ -201,8 +201,8 @@ Now, let's remove the need for registering the micro frontends upfront with shel
             path: 'mf-passenger',
             loadChildren: () =>
                 loadRemoteModule<PassengerMf>({
+                    type: 'module',
                     remoteEntry: 'http://localhost:3000/remoteEntry.js',
-                    remoteName: 'passenger',
                     exposedModule: './module'
                 })
                 .then(esm => esm.PassengerModule)
@@ -228,38 +228,16 @@ This was quite easy, wasn't it? However, we can improve this solution a bit. Ide
     import { loadRemoteEntry } from '@angular-architects/module-federation';
 
     Promise.all([
-        loadRemoteEntry('http://localhost:3000/remoteEntry.js', 'passenger')
+        loadRemoteEntry({ type: 'module', remoteEntry: 'http://localhost:3000/remoteEntry.js' })
     ])
         .catch(err => console.error('Error loading remote entries', err))
         .then(() => import('./bootstrap'))
         .catch(err => console.error(err));
     ```
 
-7. Open the file `app.routes.ts` and comment out (or remove) the property `remoteEntry`:
+7. Restart both, the `flight-app` shell and the `passenger` micro frontend. 
 
-    ```typescript
-    import { loadRemoteModule } from '@angular-architects/module-federation';
-
-    [...]
-    const routes: Routes = [
-        [...]
-        {
-            path: 'mf-passenger',
-            loadChildren: () =>
-                loadRemoteModule({
-                    // remoteEntry: 'http://localhost:3000/remoteEntry.js',
-                    remoteName: 'passenger',
-                    exposedModule: './module'
-                })
-                .then(m => m.PassengerModule)
-        },
-        [...]
-    ]
-    ```
- 
-8. Restart both, the `flight-app` shell and the `passenger` micro frontend. 
-
-9. The shell should still be able to load the micro frontend.
+8. The shell should still be able to load the micro frontend.
 
 ## Bonus: Share a Library of your Monorepo *
 
@@ -279,27 +257,7 @@ This was quite easy, wasn't it? However, we can improve this solution a bit. Ide
 
 3. As most IDEs only read global configuration files like the `tsconfig.base.json` once, restart your IDE (alternatively, your IDE might also provide an option for reloading these settings, e. g. by restarting the TypeScript Language Server).
 
-4. Open the `flight-app`'s `webpack.config.js` and register the created `auth-lib` with the `sharedMappings`:
-
-    ```typescript
-    const sharedMappings = new mf.SharedMappings();
-    sharedMappings.register(
-        path.join(__dirname, '../../tsconfig.base.json'),
-        ['@flight-workspace/shared/auth-lib'] // <-- Add this entry!  
-    );
-    ```
-
-5. Also, open the micro frontend's (`passenger`) `webpack.config.js` and do the same:
-
-    ```typescript
-    const sharedMappings = new mf.SharedMappings();
-    sharedMappings.register(
-        path.join(__dirname, '../../tsconfig.base.json'),
-        ['@flight-workspace/shared/auth-lib'] // <-- Add this entry!  
-    );
-    ```
-
-6. Switch to your `auth-lib` project. In it's folder ``auth-lib\src\lib``, create a file ``auth-lib.service.ts`` with the following service:
+4. Switch to your `auth-lib` project. In it's folder ``auth-lib\src\lib``, create a file ``auth-lib.service.ts`` with the following service:
 
     ```typescript
     import { Injectable } from '@angular/core';
@@ -321,7 +279,7 @@ This was quite easy, wasn't it? However, we can improve this solution a bit. Ide
     }
     ```
 
-7. Switch to the ``index.ts`` of your ``auth-lib`` and make sure that the ``AuthLibService`` is exported:
+5. Switch to the ``index.ts`` of your ``auth-lib`` and make sure that the ``AuthLibService`` is exported:
 
     ```typescript
     export * from './lib/shared-auth-lib.module';
@@ -329,7 +287,7 @@ This was quite easy, wasn't it? However, we can improve this solution a bit. Ide
     export { AuthLibService } from './lib/auth-lib.service';
     ```
 
-8. Switch to your `flight-app` project and open its `app.component.ts`. Use the shared `AuthLibService` to login a user:
+6. Switch to your `flight-app` project and open its `app.component.ts`. Use the shared `AuthLibService` to login a user:
 
     ```typescript
     // Perhaps you need to add this manually:
@@ -349,7 +307,7 @@ This was quite easy, wasn't it? However, we can improve this solution a bit. Ide
     }
     ```
 
-9.  Switch to your `passenger-feature-search` library and open its `search.component.ts`. Use the shared service to retrieve the current user's name:
+7. Switch to your `passenger-feature-search` library and open its `search.component.ts`. Use the shared service to retrieve the current user's name:
 
     ```typescript
     export class SearchComponent {
@@ -364,18 +322,18 @@ This was quite easy, wasn't it? However, we can improve this solution a bit. Ide
     }
     ```
 
-10. Open this component's template (`search.component.html`) and data bind the property ``user``:
+8. Open this component's template (`search.component.html`) and data bind the property ``user``:
 
-    ```html
-    <div class="content">
-        <div>User: {{user}}</div>
-        [...]
-    </div>
+   ```html
+   <div class="content">
+       <div>User: {{user}}</div>
+       [...]
+   </div>
 	```
 
-11. Restart both, the `flight-app` and the micro frontend (`passenger`). 
+9. Restart both, the `flight-app` and the micro frontend (`passenger`). 
 
-12. In the shell, navigate to the micro frontend. If it shows the same user name, the library is shared.
+10. In the shell, navigate to the micro frontend. If it shows the same user name, the library is shared.
 
 
 ## Module Federation and Web Components (Multiple Versions and Frameworks)
